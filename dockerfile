@@ -10,14 +10,15 @@ RUN apk update && \
     apk add --no-cache git && \
     apk add --no-cache containerd && \
     apk add --no-cache openrc && \
+    apk add --no-cache cni-plugins && \
     rm -rf /var/cache/apk/*
 
 VOLUME [ "/sys/fs/cgroup" ]
+# fixs: /lib/rc/sh/openrc-run.sh: line 279: can't create /sys/fs/cgroup/*/tasks: Read-only file system
 
-COPY logger.sh /scripts/logger.sh
-COPY s0_entry.sh /scripts/s0_entry.sh
-COPY s1_prepare.sh /scripts/s1_prepare.sh
+COPY ./scripts/logger.sh /scripts/logger.sh
+COPY ./scripts/s0_entry.sh /scripts/s0_entry.sh
+COPY ./scripts/s1_prepare.sh /scripts/s1_prepare.sh
      
 ENTRYPOINT ["/scripts/s0_entry.sh"]
 # CMD ["/bin/sh", "/scripts/s1_prepare.sh"]
-

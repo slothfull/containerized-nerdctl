@@ -33,7 +33,7 @@ $ cd /nerdctl
 $ make all
 ...
 error obtaining VCS status: exit status 128
-        Use -buildvcs=false to disable VCS stamping.
+Use -buildvcs=false to disable VCS stamping.
 make: *** [Makefile:57: nerdctl] Error 1
 ```
 
@@ -55,8 +55,8 @@ index 844ae72..eae05e2 100644
 /repo1/metung/txt/nerdctl
 ```
 
-install containerd on alpine
-----------------------------
+install containerd & start containerd using openrc on alpine
+------------------------------------------------------------
 install containerd apk and openrc for startup it as a service:
 ```text
 $ apk add containerd containerd-openrc
@@ -90,3 +90,21 @@ $ echo $?
 1
 ```
 
+error when using nerdctl based on containerd on alpine docker container
+-----------------------------------------------------------------------
+```text
+$ nerdctl pull alpine
+docker.io/library/alpine:latest:                                                  resolved       |++++++++++++++++++++++++++++++++++++++|
+index-sha256:51b67269f354137895d43f3b3d810bfacd3945438e94dc5ac55fdac340352f48:    exists         |++++++++++++++++++++++++++++++++++++++|
+manifest-sha256:13b7e62e8df80264dbb747995705a986aa530415763a6c58f84a3ca8af9a5bcd: exists         |++++++++++++++++++++++++++++++++++++++|
+config-sha256:f8c20f8bbcb684055b4fea470fdd169c86e87786940b3262335b12ec3adef418:   exists         |++++++++++++++++++++++++++++++++++++++|
+elapsed: 2.5 s                                                                    total:   0.0 B (0.0 B/s)
+
+$ nerdctl images
+REPOSITORY    TAG       IMAGE ID        CREATED           PLATFORM       SIZE         BLOB SIZE
+alpine        latest    51b67269f354    48 minutes ago    linux/amd64    7.7 MiB      3.3 MiB
+nginx         latest    4c0fdaa8b634    43 minutes ago    linux/amd64    191.9 MiB    67.3 MiB
+
+$ nerdctl run -it alpine sh
+FATA[0000] failed to create shim task: failed to mount rootfs component: invalid argument: unknown
+```

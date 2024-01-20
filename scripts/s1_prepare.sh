@@ -2,16 +2,16 @@
 
 . /scripts/logger.sh
 
-log_print "$0 running"
-
-nerdctl='/nerdctl/_output/nerdctl'
-if [ -f "${nerdctl}" ]; then
-    ln -s "${nerdctl}" /usr/local/bin/nerdctl
-    log_print 'nerdctl binary add to path'
-else
-    log_error 'no binary executable nerdctl found under /nerdctl/_outputs'
-    exit 1
-fi
+prepare_nerdctl_binary() {
+    nerdctl='/nerdctl/_output/nerdctl'
+    if [ -f "${nerdctl}" ]; then
+        ln -s "${nerdctl}" /usr/local/bin/nerdctl
+        log_print 'nerdctl binary add to path'
+    else
+        log_error 'no binary executable nerdctl found under /nerdctl/_outputs'
+        exit 1
+    fi
+}
 
 startup_containerd_openrc() {
     : '
@@ -43,11 +43,19 @@ startup_containerd_openrc() {
     log_print 'containerd started'
 }
 
-start_() {
+start() {
     nerdctl ps -a
     log_print 'nerdctl started'
 }
 
+log_print "$0 running"
+
+prepare_nerdctl_binary
+startup_containerd_openrc
+
 log_print "$0 finsihed"
 
+# using cmd next as main process for container
 exec "$@"
+
+# add cni plugin for nerdctl
