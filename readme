@@ -125,3 +125,6 @@ nginx         latest    4c0fdaa8b634    43 minutes ago    linux/amd64    191.9 M
 $ nerdctl run -it alpine sh
 FATA[0000] failed to create shim task: failed to mount rootfs component: invalid argument: unknown
 ```
+
+question from stackoverflow created:
+ref: https://stackoverflow.com/questions/77853986/issue-when-running-nerdctl-inside-docker-alpine-container-failed-to-create-shim
