@@ -1,3 +1,20 @@
+project structure
+-----------------
+```text
+.
+├── containerd    # git clone
+├── dockerfile
+├── info
+├── Makefile
+├── nerdctl       # git clone
+├── readme
+├── r.sh
+└── scripts
+
+3 directories, 5 files
+```
+
+
 download src code and reset to nerdctl 1.5.0
 --------------------------------------------
 
