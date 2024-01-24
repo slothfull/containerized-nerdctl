@@ -13,6 +13,14 @@ prepare_nerdctl_binary() {
     fi
 }
 
+prepare_containerd_binary() {
+    :  # todo
+}
+
+prepare_containerd_service() {
+    :  # ref to 
+}
+
 startup_containerd_openrc() {
     : '
     # issues when try with bare fists:
