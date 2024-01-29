@@ -5,24 +5,18 @@ project structure
 -----------------
 ```text
 .
-├── containerd
-├── dockerfile
-├── info
-├── Makefile
-├── modlist
-├── nerdctl
+├── dockerfile         # dockerfile for provide env to run runc + containerd + nerdctl
+├── info               # config for docker build params
+├── lib                # vol mount to /var/lib/contianerd in docker container
+├── Makefile           # auto script
+├── modlist            # host env ko list (need to be eliminated)
+├── nerdctl            # nerdctl src code cloned from upstream
 ├── readme
-├── r.sh
-├── scripts
-└── tmp
+├── r.sh               # env container startup script
+└── scripts            # script to prepare alpine container env
 
 4 directories, 6 files
-
 ```
-
-
-download src code and reset to nerdctl 1.5.0
---------------------------------------------
 
 
 docker buildkit
@@ -49,8 +43,13 @@ the --mount option requires BuildKit. Refer to https://docs.docker.com/go/buildk
 solution ref: https://docs.docker.com/go/buildkit/
 
 
-error when try make nerdctl and containerd
-------------------------------------------
+make & installation of nerdctl
+------------------------------
+download the source code from nerdctl release page with certain version:
+```text
+$ wget ...
+```
+mount the nerdctl folder into alpine docker container in r.sh, inside docker compilation env, run:
 ```text
 $ cd /nerdctl
 $ make all

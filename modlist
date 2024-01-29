@@ -1,3 +1,4 @@
+```text
 Module                  Size  Used by
 xt_comment             16384  0 
 act_mirred             16384  72 
@@ -111,3 +112,9 @@ loop                   36864  22
 tun                    53248  240 
 fuse                  118784  95 
 ip_tables              28672  44 iptable_filter,iptable_raw,iptable_nat,iptable_mangle
+```
+
+ko related to iptables --comment extension (for cni-plugins to get work)
+"xt_mark"
+"xt_comment"
+"xt_multiport"
