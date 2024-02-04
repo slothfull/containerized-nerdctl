@@ -95,9 +95,6 @@ $ nerdctl run -it alpine sh
 FATA[0000] failed to create shim task: failed to mount rootfs component: invalid argument: unknown
 ```
 
-question from stackoverflow created:
-ref: https://stackoverflow.com/questions/77853986/issue-when-running-nerdctl-inside-docker-alpine-container-failed-to-create-shim
-
 follow suggestions to add the empty dir mounted to /var/lib/containerd in container (r.sh):
 ```text
 docker run -it --rm \
@@ -106,7 +103,13 @@ docker run -it --rm \
     --privileged --cap-add all nerdctl:test /scripts/prepare.sh sh
 ```
 
-the above error is gone, but containerd -> runc still failed to startup:
+why we need to mount at least /var/lib/containerd for running containerd?
+the dir is for storage of containerd persistent data, at least a vol of host need to be mounted inside.
+see the reference code line:
+https://github.com/containerd/containerd/blob/96bf529cbf55940ddb96bb8adc8be51b11922ebb/defaults/defaults_unix.go#L24
+see also /var/lib/docker in docker doc.
+
+after add the mount, the above error is gone, but containerd -> runc still failed to startup:
 ```text
 $(alpine) nerdctl run -it --rm alpine sh
 docker.io/library/alpine:latest:                                                  resolved       |++++++++++++++++++++++++++++++++++++++|
