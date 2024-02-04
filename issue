@@ -107,7 +107,9 @@ why we need to mount at least /var/lib/containerd for running containerd?
 the dir is for storage of containerd persistent data, at least a vol of host need to be mounted inside.
 see the reference code line:
 https://github.com/containerd/containerd/blob/96bf529cbf55940ddb96bb8adc8be51b11922ebb/defaults/defaults_unix.go#L24
+
 see also /var/lib/docker in docker doc.
+code in action: hostfw/pkg_host/core/device.py -> self.sb.add_volume_mapping(volume_name, "/var/lib/docker", False).
 
 after add the mount, the above error is gone, but containerd -> runc still failed to startup:
 ```text
