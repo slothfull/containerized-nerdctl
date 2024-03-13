@@ -1,5 +1,5 @@
-TODO: further will make knoledge of minimal ko needed for bring up nerdctl in alpine docker
-TODO: get enough ENV info for this project
+TODO: further will make knowledge of minimal ko needed for bring up nerdctl in alpine docker
+TODO: get enough host ENV info for this project
 
 project structure
 -----------------
@@ -25,3 +25,63 @@ project target
 2 code walk into nerdctl 1.5.0, especially the container network area & cli organization.
 3 test & reproduce & fix the nerdctl 1.5.0 port mapping issue.
 4 code walk into containerd with runc 1.7.2, especially the container runtime.
+
+
+share storage layers between containerized nerdctl(dind) & host container daemon
+--------------------------------------------------------------------------------
+>>> in the dind view of docker in docker:
+when running a container with docker’s official dind image, docker implicitly creates
+a volume on the host and mounts it into the dind container’s '/var/lib/docker'.
+this is done to avoid an 'overlayfs-over-overlayfs' scenario (not supported by overlayfs).
+
+when stop, remove, start a new dind container, docker creates another volume for this.
+unfortunately it does not delete the old volume (leading to volume sprawl till eat-up your storage),
+which the above can be confirmed by:
+```text
+$ docker volume ls
+```
+as you start, stop, remove dind containers.
+
+you can do this by bind-mounting a host dir of your choice to the dind container’s /var/lib/docker dir.
+inner container images handled by dind will be stored on this host dir and be persist across the dind container’s whole lifecycle.
+```text
+$ cd $HOME
+$ mkdir docker-cache
+$ docker run --privileged --name "${name}" -d --network "${network}" --network-alias docker \
+      -e DOCKER_TLS_CERTDIR=/certs \
+      -v some-docker-certs-ca:/certs/ca \
+      -v some-docker-certs-client:/certs/client \
+      --mount type=bind,source=/home/"${user}"/docker-cache,destination=/var/lib/docker \
+  docker:dind
+```
+
+>>> in the dind view of nerdctl in docker(this project):
+mount a /lib in project root inside wrapper docker container to /var/lib/containerd, which will
+be used for containerd storage.
+
+the images pulled by inner nerdctl cli will be pesistent each time are startup the dind:
+```text
+$(host) ./r.sh  # startup the dind
+2024-03-13 14:53:50. >>> /scripts/entry.sh running
+2024-03-13 14:53:50. >>> /scripts/entry.sh finished
+2024-03-13 14:53:50. >>> /scripts/prepare.sh running
+2024-03-13 14:53:50. >>> nerdctl binary add to path
+ * Caching service dependencies ...
+Service `hwdrivers' needs non existent service `dev'
+Service `machine-id' needs non existent service `dev'  [ ok ]
+Runlevel: sysinit
+Dynamic Runlevel: hotplugged
+Dynamic Runlevel: needed/wanted
+Dynamic Runlevel: manual
+ * service containerd added to runlevel default
+ * /var/log/containerd.log: creating file
+ * Starting Container Daemon ...                       [ ok ]
+ * status: started
+2024-03-13 14:53:51. >>> containerd started
+2024-03-13 14:53:51. >>> /scripts/prepare.sh finsihed
+
+$(container) nerdctl images
+REPOSITORY    TAG       IMAGE ID        CREATED              PLATFORM       SIZE       BLOB SIZE
+alpine        latest    c5b1261d6d3e    About an hour ago    linux/amd64    7.7 MiB    3.3 MiB
+```
+hence we could see the existence of the image pulled 1 hours ago in another runtime of the dind.
